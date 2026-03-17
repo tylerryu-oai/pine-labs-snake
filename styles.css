@@ -1,0 +1,125 @@
+:root {
+  color-scheme: light;
+  --page-bg: #f3efe7;
+  --panel-bg: #fffdf8;
+  --panel-border: #d4c8b8;
+  --grid-bg: #f6f0e4;
+  --grid-line: #e6dccb;
+  --snake-head: #315c3a;
+  --snake-body: #4f8a57;
+  --food: #c95a45;
+  --text-main: #2f2418;
+  --text-muted: #6d6152;
+  --button-bg: #efe4d1;
+  --button-border: #c9bba6;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  font-family: "Avenir Next", Avenir, "Segoe UI", sans-serif;
+  background: var(--page-bg);
+  color: var(--text-main);
+}
+
+.app-shell {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+}
+
+.game-panel {
+  width: min(100%, 560px);
+  background: var(--panel-bg);
+  border: 1px solid var(--panel-border);
+  border-radius: 18px;
+  padding: 20px;
+  box-shadow: 0 12px 30px rgba(70, 51, 27, 0.08);
+}
+
+.hud {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.label {
+  margin: 0 0 4px;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+}
+
+.value {
+  margin: 0;
+  font-size: 1.2rem;
+  font-weight: 700;
+}
+
+.board-wrap {
+  border: 1px solid var(--panel-border);
+  border-radius: 14px;
+  overflow: hidden;
+  background: var(--grid-bg);
+}
+
+#board {
+  display: block;
+  width: 100%;
+  height: auto;
+  touch-action: none;
+}
+
+.actions,
+.touch-row,
+.touch-controls {
+  display: flex;
+  gap: 10px;
+}
+
+.actions {
+  margin-top: 16px;
+}
+
+button {
+  appearance: none;
+  border: 1px solid var(--button-border);
+  background: var(--button-bg);
+  color: var(--text-main);
+  border-radius: 12px;
+  padding: 10px 14px;
+  font: inherit;
+  cursor: pointer;
+}
+
+button:active {
+  transform: translateY(1px);
+}
+
+.controls-panel {
+  margin-top: 14px;
+}
+
+.help {
+  margin: 0 0 12px;
+  color: var(--text-muted);
+  line-height: 1.4;
+}
+
+.touch-controls {
+  flex-direction: column;
+  align-items: center;
+}
+
+@media (min-width: 700px) {
+  .touch-controls {
+    display: none;
+  }
+}
