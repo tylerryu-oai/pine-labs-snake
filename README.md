@@ -15,12 +15,13 @@ Start the app:
 1. Run `npm install`.
    This repo does not pull packages today, but this keeps the workflow consistent and creates a lockfile if you want one later.
 2. Run `npm run dev`.
-3. Open `http://localhost:3000`.
+3. Open `http://localhost:3210`.
 
-If port `3000` is already in use, start the server on a different port:
+The app defaults to port `3210`. To use a different port:
 
-1. Run `PORT=3210 npm run dev`.
-2. Open `http://localhost:3210`.
+1. Run `PORT=4000 npm run dev`.
+2. Replace `4000` with your preferred port number.
+3. Open `http://localhost:<your-port>`.
 
 ## Run tests
 
