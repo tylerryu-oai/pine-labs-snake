@@ -1,4 +1,5 @@
 import {
+  clampDeltaMs,
   createInitialState,
   queueDirection,
   restartGame,
@@ -9,6 +10,8 @@ import {
 
 const CELL_COUNT = 16;
 const TICK_MS = 140;
+const MAX_CATCH_UP_TICKS = 4;
+const MAX_FRAME_DELTA_MS = TICK_MS * MAX_CATCH_UP_TICKS;
 
 const canvas = document.querySelector("#board");
 const context = canvas.getContext("2d");
@@ -31,7 +34,7 @@ function frame(now) {
 }
 
 function update(deltaMs) {
-  accumulatedMs += deltaMs;
+  accumulatedMs += clampDeltaMs(deltaMs, MAX_FRAME_DELTA_MS);
 
   while (accumulatedMs >= TICK_MS) {
     accumulatedMs -= TICK_MS;
@@ -148,7 +151,7 @@ function handleRestart() {
 }
 
 function handlePauseToggle() {
-  if (state.status === "ready") {
+  if (state.status === "ready" || state.status === "game-over" || state.status === "won") {
     return;
   }
   state = togglePause(state);

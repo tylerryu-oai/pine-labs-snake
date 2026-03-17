@@ -12,12 +12,25 @@ export const OPPOSITE_DIRECTION = {
   right: "left"
 };
 
-export function createInitialSnake() {
-  return [
-    { x: 8, y: 7 },
-    { x: 7, y: 7 },
-    { x: 6, y: 7 }
-  ];
+export function createInitialSnake({ cols, rows }) {
+  assertValidBoardDimensions(cols, rows);
+
+  const length = Math.min(3, cols);
+  const headX = Math.max(length - 1, Math.floor(cols / 2));
+  const centerY = Math.floor(rows / 2);
+
+  return Array.from({ length }, (_, index) => ({
+    x: headX - index,
+    y: centerY
+  }));
+}
+
+export function clampDeltaMs(deltaMs, maxDeltaMs) {
+  if (!Number.isFinite(deltaMs) || deltaMs <= 0) {
+    return 0;
+  }
+
+  return Math.min(deltaMs, maxDeltaMs);
 }
 
 export function placeFood({ cols, rows, snake, random = Math.random }) {
@@ -48,7 +61,11 @@ export function placeFood({ cols, rows, snake, random = Math.random }) {
 export function createInitialState(options = {}) {
   const cols = options.cols ?? 16;
   const rows = options.rows ?? 16;
-  const snake = options.snake ? options.snake.map(copyPoint) : createInitialSnake();
+  assertValidBoardDimensions(cols, rows);
+
+  const snake = options.snake
+    ? options.snake.map(copyPoint)
+    : createInitialSnake({ cols, rows });
   const direction = options.direction ?? "right";
   const queuedDirection = direction;
   const food =
@@ -92,7 +109,7 @@ export function queueDirection(state, nextDirection) {
 }
 
 export function togglePause(state) {
-  if (state.status === "game-over") {
+  if (state.status === "game-over" || state.status === "won") {
     return state;
   }
 
@@ -210,4 +227,10 @@ function getNextDirection(currentDirection, queuedDirection) {
 
 function copyPoint(point) {
   return { x: point.x, y: point.y };
+}
+
+function assertValidBoardDimensions(cols, rows) {
+  if (!Number.isInteger(cols) || !Number.isInteger(rows) || cols < 1 || rows < 1) {
+    throw new RangeError("Board dimensions must be positive integers.");
+  }
 }

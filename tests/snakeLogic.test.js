@@ -2,10 +2,12 @@ import test from "node:test";
 import assert from "node:assert/strict";
 
 import {
+  clampDeltaMs,
   createInitialState,
   placeFood,
   queueDirection,
-  stepGame
+  stepGame,
+  togglePause
 } from "../src/snakeLogic.js";
 
 test("moves one cell in the current direction", () => {
@@ -116,4 +118,51 @@ test("reverse direction input is ignored", () => {
   const next = queueDirection(state, "left");
 
   assert.equal(next.queuedDirection, "right");
+});
+
+test("pause toggle is ignored once the game is won", () => {
+  const state = createInitialState({
+    status: "won",
+    isPaused: false
+  });
+
+  const next = togglePause(state);
+
+  assert.equal(next, state);
+  assert.equal(next.status, "won");
+  assert.equal(next.isPaused, false);
+});
+
+test("small board initialization stays in bounds", () => {
+  const state = createInitialState({
+    cols: 5,
+    rows: 5
+  });
+
+  assert.equal(state.snake.length, 3);
+  assert.ok(state.snake.every((segment) => segment.x >= 0 && segment.x < 5));
+  assert.ok(state.snake.every((segment) => segment.y >= 0 && segment.y < 5));
+});
+
+test("very narrow boards create a shorter initial snake", () => {
+  const state = createInitialState({
+    cols: 2,
+    rows: 4
+  });
+
+  assert.deepEqual(state.snake, [
+    { x: 1, y: 2 },
+    { x: 0, y: 2 }
+  ]);
+});
+
+test("invalid board dimensions fail fast", () => {
+  assert.throws(() => createInitialState({ cols: 0, rows: 5 }), /positive integers/i);
+  assert.throws(() => createInitialState({ cols: 5, rows: -1 }), /positive integers/i);
+});
+
+test("frame delta clamping limits long stalls", () => {
+  assert.equal(clampDeltaMs(1000, 560), 560);
+  assert.equal(clampDeltaMs(120, 560), 120);
+  assert.equal(clampDeltaMs(-1, 560), 0);
 });

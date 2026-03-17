@@ -15,11 +15,22 @@ const MIME_TYPES = {
 };
 
 const server = http.createServer((request, response) => {
-  const requestedPath = request.url === "/" ? "/index.html" : request.url;
-  const normalizedPath = path.normalize(requestedPath).replace(/^(\.\.[/\\])+/, "");
-  const filePath = path.join(__dirname, normalizedPath);
+  const requestedPath = getRequestPath(request);
+  if (!requestedPath) {
+    response.writeHead(400, { "Content-Type": "text/plain; charset=utf-8" });
+    response.end("Bad request");
+    return;
+  }
 
-  if (!filePath.startsWith(__dirname) || !existsSync(filePath) || statSync(filePath).isDirectory()) {
+  const normalizedPath = path.normalize(requestedPath);
+  const relativePath = normalizedPath.replace(/^[/\\]+/, "");
+  const filePath = path.resolve(__dirname, relativePath);
+
+  if (
+    !filePath.startsWith(`${__dirname}${path.sep}`) ||
+    !existsSync(filePath) ||
+    statSync(filePath).isDirectory()
+  ) {
     response.writeHead(404, { "Content-Type": "text/plain; charset=utf-8" });
     response.end("Not found");
     return;
@@ -35,3 +46,13 @@ const server = http.createServer((request, response) => {
 server.listen(port, () => {
   console.log(`Snake server running at http://localhost:${port}`);
 });
+
+function getRequestPath(request) {
+  try {
+    const parsedUrl = new URL(request.url ?? "/", `http://${request.headers.host ?? "localhost"}`);
+    const pathname = parsedUrl.pathname === "/" ? "/index.html" : parsedUrl.pathname;
+    return decodeURIComponent(pathname);
+  } catch {
+    return null;
+  }
+}
